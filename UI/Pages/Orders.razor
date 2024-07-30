@@ -1,0 +1,127 @@
+﻿@page "/orders"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using UI.Dtos
+@using UI.Services.Interfaces
+@inject NavigationManager _navigationManager
+@inject IOrderService _orderService
+
+<PageTitle>Orders</PageTitle>
+
+<h1>Orders</h1>
+
+
+
+@if (orders == null || isLoading)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row p-2">
+        <div class="col-3">
+            <div class="form-group">
+                <label class="form-label">Order Number</label>
+                <InputText @bind-Value="filterOrderNumber" class="form-control"></InputText>
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="form-group">
+                <label class="form-label">Order Date From</label>
+                <InputDate @bind-Value="filterOrderDateFrom" class="form-control"></InputDate>
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="form-group">
+                <label class="form-label">Order Date To</label>
+                <InputDate @bind-Value="filterOrderDateTo" class="form-control"></InputDate>
+            </div>
+        </div>
+        <div class="col-3 align-content-end">
+            <button class="btn btn-primary" @onclick="GetOrders">Search</button>
+            <button class="btn btn-secondary" @onclick="Reset">Reset</button>
+            <button class="btn btn-primary float-end" @onclick="NavigateToCreateOrderPage">Add Order</button>
+        </div>
+    </div>
+
+    <QuickGrid Items="orders.AsQueryable()">
+        <PropertyColumn Property="@(p => p.OrderNumber)" Title="Order Number" Sortable="true" />
+        <PropertyColumn Property="@(p => p.TypeValue)" Title="Order Type" Sortable="true" />
+        <PropertyColumn Property="@(p => p.StatusValue)" Title="Order Status" Sortable="true" />
+        <PropertyColumn Property="@(p => p.CustomerName)" Title="Customer Name" Sortable="true" />
+        <PropertyColumn Property="@(p => p.OrderDate)" Title="Order Date" Sortable="true" />
+        <PropertyColumn Property="@(p => p.CreatedDate)" Title="Order Created Date" Sortable="true" />
+        <TemplateColumn Title="Actions">
+            <button @onclick="() => NavigateToViewOrderLinesPage((Guid)context.Id!)" class="btn btn-primary btn-sm" title="View Order Lines"><i class="fa-solid fa-eye"></i></button>
+            <button @onclick="() => NavigateToEditOrderPage((Guid)context.Id!)" class="btn btn-primary btn-sm" title="Edit Order"><i class="fa-solid fa-pencil"></i></button>
+            <button @onclick="() => DeleteModal(context)" class="btn btn-primary btn-sm" title="Delete Order"><i class="fa-solid fa-trash"></i></button>
+        </TemplateColumn>
+    </QuickGrid>
+}
+
+@code {
+    [CascadingParameter] public IModalService _modal { get; set; }
+    private List<OrderDto>? orders;
+    private bool isLoading = false;
+    private string? filterOrderNumber;
+    private DateTime? filterOrderDateFrom;
+    private DateTime? filterOrderDateTo;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetOrders();
+    }
+
+    private async Task GetOrders()
+    {
+        var result = await _orderService.GetOrders();
+
+        orders = result.Where(_ =>
+            filterOrderNumber != null ? _.OrderNumber.Contains(filterOrderNumber) : true &&
+            filterOrderDateFrom != null ? _.OrderDate > filterOrderDateFrom : true &&
+            filterOrderDateTo != null ? _.OrderDate < filterOrderDateTo : true
+        ).ToList();
+    }
+
+    private async Task Reset()
+    {
+        filterOrderNumber = null;
+        filterOrderDateFrom = null;
+        filterOrderDateTo = null;
+
+        await GetOrders();
+    }
+
+    private void NavigateToCreateOrderPage()
+    {
+        _navigationManager.NavigateTo("manage-order");
+    }
+
+    private void NavigateToViewOrderLinesPage(Guid orderId)
+    {
+        _navigationManager.NavigateTo($"order-lines/{orderId}");
+    }
+
+    private void NavigateToEditOrderPage(Guid id)
+    {
+        _navigationManager.NavigateTo($"manage-order/{id}");
+    }
+
+    private async Task DeleteModal(OrderDto order)
+    {
+        var parameters = new ModalParameters()
+            .Add(nameof(ConfirmModal.message), $"Are you sure you want to delete the order with Order Number: {order.OrderNumber}?");
+        var confirmModal = _modal.Show<ConfirmModal>("Delete Order", parameters);
+
+        var result = await confirmModal.Result;
+
+        if (result.Confirmed)
+        {
+            isLoading = true;
+
+            await _orderService.DeleteOrder((Guid)order.Id!);
+            await GetOrders();
+
+            isLoading = false;
+        }
+    }
+}

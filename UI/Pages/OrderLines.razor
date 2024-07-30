@@ -1,0 +1,114 @@
+﻿@page "/order-lines/{orderId:guid}"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using UI.Dtos
+@using UI.Services.Interfaces
+@inject NavigationManager _navigationManager
+@inject IOrderLineService _orderLineService
+
+<PageTitle>Order Lines</PageTitle>
+
+<h1>Orders Lines</h1>
+
+
+
+@if (orderLines == null || isLoading)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row p-2">
+        <div class="col-3">
+            <div class="form-group">
+                <label class="form-label">Product Code</label>
+                <InputText @bind-Value="filterProductCode" class="form-control"></InputText>
+            </div>
+        </div>
+        <div class="col-9 align-content-end">
+            <button class="btn btn-primary" @onclick="GetOrderLines">Search</button>
+            <button class="btn btn-secondary" @onclick="Reset">Reset</button>
+            <button class="btn btn-primary float-end" @onclick="NavigateToCreateOrderLinePage">Create Order Line</button>
+            <button @onclick="NavigateToOrdersPage" class="btn btn-secondary float-end me-2">Back to Orders</button>
+        </div>
+    </div>
+
+    <QuickGrid Items="orderLines.AsQueryable()">
+        <PropertyColumn Property="@(p => p.LineNumber)" Title="Line Number" Sortable="true" />
+        <PropertyColumn Property="@(p => p.ProductCode)" Title="Product Code" Sortable="true" />
+        <PropertyColumn Property="@(p => p.ProductTypeValue)" Title="Product Type" Sortable="true" />
+        <PropertyColumn Property="@(p => p.CostPrice)" Title="Product Cost Price" Sortable="true" />
+        <PropertyColumn Property="@(p => p.SalesPrice)" Title="Product Sales Price" Sortable="true" />
+        <PropertyColumn Property="@(p => p.Quantity)" Title="Quantity" Sortable="true" />
+        <TemplateColumn Title="Actions">
+            <button @onclick="() => NavigateToEditOrderLinePage((Guid)context.Id!)" class="btn btn-primary btn-sm" title="Edit Order Line"><i class="fa-solid fa-pencil"></i></button>
+            <button @onclick="() => DeleteModal(context)" class="btn btn-primary btn-sm" title="Delete Order Line"><i class="fa-solid fa-trash"></i></button>
+        </TemplateColumn>
+    </QuickGrid>
+}
+
+@code {
+    [Parameter] public Guid orderId { get; set; }
+    [CascadingParameter] public IModalService _modal { get; set; }
+    private List<OrderLineDto>? orderLines;
+    private bool isLoading = false;
+    private string? filterProductCode;
+    private DateTime? filterOrderDateFrom;
+    private DateTime? filterOrderDateTo;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetOrderLines();
+    }
+
+    private async Task GetOrderLines()
+    {
+        var result = await _orderLineService.GetOrderLines(orderId);
+
+        orderLines = result.Where(_ =>
+            filterProductCode != null ? _.ProductCode.Contains(filterProductCode) : true
+        ).ToList();
+    }
+
+    private async Task Reset()
+    {
+        filterProductCode = null;
+        filterOrderDateFrom = null;
+        filterOrderDateTo = null;
+
+        await GetOrderLines();
+    }
+
+    private void NavigateToOrdersPage()
+    {
+        _navigationManager.NavigateTo("orders");
+    }
+
+    private void NavigateToCreateOrderLinePage()
+    {
+        _navigationManager.NavigateTo($"manage-order-line/{orderId}");
+    }
+
+    private void NavigateToEditOrderLinePage(Guid Id)
+    {
+        _navigationManager.NavigateTo($"manage-order-line/{orderId}/{Id}");
+    }
+
+    private async Task DeleteModal(OrderLineDto orderLine)
+    {
+        var parameters = new ModalParameters()
+            .Add(nameof(ConfirmModal.message), $"Are you sure you want to delete the order with Line Number: {orderLine.LineNumber}?");
+        var confirmModal = _modal.Show<ConfirmModal>("Delete Order Line", parameters);
+
+        var result = await confirmModal.Result;
+
+        if (result.Confirmed)
+        {
+            isLoading = true;
+
+            await _orderLineService.DeleteOrderLine((Guid)orderLine.Id!);
+            await GetOrderLines();
+
+            isLoading = false;
+        }
+    }
+}

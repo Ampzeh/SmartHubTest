@@ -1,0 +1,129 @@
+﻿@page "/manage-order-line/{orderId:guid}"
+@page "/manage-order-line/{orderId:guid}/{id:guid}"
+@using UI.Dtos
+@using UI.Dtos.Utilities
+@using UI.Services.Interfaces
+@inject NavigationManager _navigationManager
+@inject IOrderLineService _orderLineService
+@inject IUtilityService _utilityService
+
+<PageTitle>Order Line</PageTitle>
+
+@if (isEdit)
+{
+    <h1>Edit Order Line</h1>
+}
+else
+{
+    <h1>Create Order Line</h1>
+}
+
+@if (utilities == null || isLoading)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-4">
+            <EditForm Model="orderLine" OnValidSubmit="HandleSave">
+                <DataAnnotationsValidator />
+
+                <div class="form-group">
+                    <label class="form-label">Line Number</label>
+                    <InputNumber @bind-Value="orderLine.LineNumber" class="form-control"></InputNumber>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Product Code</label>
+                    <InputText @bind-Value="orderLine.ProductCode" class="form-control"></InputText>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Product Type</label>
+                    <InputSelect @bind-Value="orderLine.ProductTypeId" class="form-control">
+                        @if (orderLine.ProductTypeId == null)
+                        {
+                            <option value="" class="d-none"></option>
+                        }
+                        @foreach (var x in utilities.ProductTypes)
+                        {
+                            <option value="@x.Id">@x.Value</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Product Cost</label>
+                    <InputNumber @bind-Value="orderLine.CostPrice" class="form-control"></InputNumber>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Product Sales</label>
+                    <InputNumber @bind-Value="orderLine.SalesPrice" class="form-control"></InputNumber>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Product Quantity</label>
+                    <InputNumber @bind-Value="orderLine.Quantity" class="form-control"></InputNumber>
+                </div>
+
+                <div class="row pt-2">
+                    <div>
+                        <button type="submit" class="btn btn-primary float-end">Save</button>
+                        <button @onclick="HandleCancel" class="btn btn-secondary float-end me-2">Cancel</button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+    
+}
+
+@code {
+    [Parameter] public Guid orderId { get; set; }
+    [Parameter] public Guid id { get; set; }
+    public OrderLineDto orderLine { get; set; } = new();
+    private ManageOrderLineUtilitiesDto utilities;
+    private bool isEdit;
+    private bool isLoading = true;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        utilities = await _utilityService.GetManageOrderLineUtilities(orderId);
+    }
+
+    private async Task HandleSave()
+    {
+        isLoading = true;
+
+        if (isEdit)
+            await _orderLineService.UpdateOrderLine(orderLine);
+        else
+            await _orderLineService.CreateOrderLine(orderLine);
+
+        NavigateToOrderLinePage();
+    }
+
+    private void HandleCancel()
+    {
+        NavigateToOrderLinePage();
+    }
+
+    private void NavigateToOrderLinePage()
+    {
+        _navigationManager.NavigateTo($"order-lines/{orderId}");
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        orderLine.OrderId = orderId;
+        isEdit = id != Guid.Empty;
+        if (isEdit)
+            orderLine = await _orderLineService.GetOrderLine(id);
+        else
+            orderLine.LineNumber = utilities.NextLineNumber;
+        isLoading = false;
+    }
+}

@@ -1,0 +1,130 @@
+﻿@page "/manage-order"
+@page "/manage-order/{id:guid}"
+@using UI.Dtos
+@using UI.Dtos.Utilities
+@using UI.Services.Interfaces
+@inject NavigationManager _navigationManager
+@inject IOrderService _orderService
+@inject IUtilityService _utilityService
+
+<PageTitle>Order</PageTitle>
+
+@if (isEdit)
+{
+    <h1>Edit Order</h1>
+}
+else
+{
+    <h1>Create Order</h1>
+}
+
+@if (utilities == null || isLoading)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-4">
+            <EditForm Model="order" OnValidSubmit="HandleSave">
+                <DataAnnotationsValidator />
+
+                <div class="form-group">
+                    <label class="form-label">Order Number</label>
+                    <InputText @bind-Value="order.OrderNumber" class="form-control"></InputText>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Order Type</label>
+                    <InputSelect @bind-Value="order.TypeId" class="form-control">
+                        @if (order.TypeId == null)
+                        {
+                            <option value="" class="d-none"></option>
+                        }
+                        @foreach (var x in utilities.OrderTypes)
+                        {
+                            <option value="@x.Id">@x.Value</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Order Status</label>
+                    <InputSelect @bind-Value="order.StatusId" class="form-control">
+                        @if (order.StatusId == null)
+                        {
+                            <option value="" class="d-none"></option>
+                        }
+                        @foreach (var x in utilities.OrderStatuses)
+                        {
+                            <option value="@x.Id">@x.Value</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Customer Name</label>
+                    <InputText @bind-Value="order.CustomerName" class="form-control"></InputText>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Order Date</label>
+                    <InputDate @bind-Value="order.OrderDate" class="form-control"></InputDate>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Order Created Date</label>
+                    <InputDate @bind-Value="order.CreatedDate" class="form-control" readonly="readonly"></InputDate>
+                </div>
+
+                <div class="row pt-2">
+                    <div>
+                        <button type="submit" class="btn btn-primary float-end">Save</button>
+                        <button @onclick="HandleCancel" class="btn btn-secondary float-end me-2">Cancel</button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+    
+}
+
+@code {
+    [Parameter] public Guid id { get; set; }
+    public OrderDto order { get; set; } = new();
+    private ManageOrderUtilitiesDto utilities;
+    private bool isEdit;
+    private bool isLoading = true;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        utilities = await _utilityService.GetManageOrderUtilities();
+    }
+
+    private async Task HandleSave()
+    {
+        isLoading = true;
+
+        if (isEdit)
+            await _orderService.UpdateOrder(order);
+        else
+            await _orderService.CreateOrder(order);
+
+        _navigationManager.NavigateTo("orders");
+    }
+
+    private void HandleCancel()
+    {
+        _navigationManager.NavigateTo("orders");
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        isEdit = id != Guid.Empty;
+        if (isEdit)
+            order = await _orderService.GetOrder(id);
+
+        isLoading = false;
+    }
+}
