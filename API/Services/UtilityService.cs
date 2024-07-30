@@ -1,9 +1,9 @@
 ﻿using API.Constants;
 using API.DataAccess;
-using API.Dtos;
-using API.Dtos.Utilities;
 using API.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Shared.Dtos;
+using Shared.Dtos.Utilities;
 
 namespace API.Services
 {

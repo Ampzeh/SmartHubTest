@@ -1,5 +1,5 @@
-﻿using API.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Shared.Models;
 
 namespace API.DataAccess
 {

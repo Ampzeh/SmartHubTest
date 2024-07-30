@@ -1,12 +1,13 @@
-﻿using API.Models;
+﻿using Shared.Models;
+using System.ComponentModel.DataAnnotations;
 
-namespace API.Dtos
+namespace Shared.Dtos
 {
     public class OrderLineDto : BaseDto
     {
         public OrderLineDto() { }
 
-        public OrderLineDto (OrderLineModel model)
+        public OrderLineDto(OrderLineModel model)
         {
             Id = model.Id;
             LineNumber = model.LineNumber;
@@ -20,12 +21,19 @@ namespace API.Dtos
             ProductTypeValue = model.ProductType?.Value;
         }
 
+        [Required]
         public int LineNumber { get; set; }
+        [Required]
         public string ProductCode { get; set; }
-        public int Quantity { get; set; }
-        public decimal SalesPrice { get; set; }
-        public decimal CostPrice { get; set; }
+        [Required]
+        public int? Quantity { get; set; }
+        [Required]
+        public decimal? SalesPrice { get; set; }
+        [Required]
+        public decimal? CostPrice { get; set; }
+        [Required]
         public Guid OrderId { get; set; }
+        [Required]
         public string ProductTypeId { get; set; }
 
         public string? ProductTypeValue { get; set; }

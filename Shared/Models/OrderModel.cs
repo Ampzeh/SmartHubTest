@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace API.Models
+namespace Shared.Models
 {
     [Table("Order")]
     public class OrderModel : BaseModel

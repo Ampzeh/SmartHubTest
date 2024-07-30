@@ -1,6 +1,6 @@
-﻿using API.Dtos;
-using API.Services.Interfaces;
+﻿using API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Dtos;
 
 namespace API.Controllers
 {

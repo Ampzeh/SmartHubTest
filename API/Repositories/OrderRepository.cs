@@ -1,7 +1,7 @@
 ﻿using API.DataAccess;
-using API.Models;
 using API.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Shared.Models;
 
 namespace API.Repositories
 {

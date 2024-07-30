@@ -1,5 +1,5 @@
 ﻿using System.Net.Http.Json;
-using UI.Dtos;
+using Shared.Dtos;
 using UI.Services.Interfaces;
 
 namespace UI.Services
