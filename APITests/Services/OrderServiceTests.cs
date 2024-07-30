@@ -1,7 +1,7 @@
-﻿using API.Dtos;
-using API.Models;
-using API.Repositories.Interfaces;
+﻿using API.Repositories.Interfaces;
 using Moq;
+using Shared.Dtos;
+using Shared.Models;
 
 namespace API.Services.Tests
 {

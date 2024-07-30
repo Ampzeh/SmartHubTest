@@ -1,4 +1,4 @@
-﻿using API.Models;
+﻿using Shared.Models;
 
 namespace API.Repositories.Interfaces
 {

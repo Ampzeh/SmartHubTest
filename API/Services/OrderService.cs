@@ -1,8 +1,8 @@
-﻿using API.Dtos;
-using API.Extensions;
+﻿using API.Extensions;
 using API.Repositories.Interfaces;
 using API.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Shared.Dtos;
 
 namespace API.Services
 {

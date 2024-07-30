@@ -1,12 +1,13 @@
-﻿using API.Models;
+﻿using Shared.Models;
+using System.ComponentModel.DataAnnotations;
 
-namespace API.Dtos
+namespace Shared.Dtos
 {
     public class OrderDto : BaseDto
     {
         public OrderDto() { }
 
-        public OrderDto (OrderModel model)
+        public OrderDto(OrderModel model)
         {
             Id = model.Id;
             OrderNumber = model.OrderNumber;
@@ -20,12 +21,18 @@ namespace API.Dtos
             StatusValue = model.Status?.Value;
         }
 
+        [Required]
         public string OrderNumber { get; set; }
+        [Required]
         public string CustomerName { get; set; }
-        public DateTime OrderDate { get; set; }
+        [Required]
+        public DateTime? OrderDate { get; set; }
+        [Required]
         public DateTime CreatedDate { get; set; }
-        public string StatusId { get; set; }
-        public string TypeId { get; set; }
+        [Required]
+        public string? StatusId { get; set; }
+        [Required]
+        public string? TypeId { get; set; }
 
         public string? TypeValue { get; set; }
         public string? StatusValue { get; set; }

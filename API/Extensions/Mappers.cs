@@ -1,5 +1,5 @@
-﻿using API.Dtos;
-using API.Models;
+﻿using Shared.Dtos;
+using Shared.Models;
 
 namespace API.Extensions
 {
@@ -14,7 +14,7 @@ namespace API.Extensions
             {
                 OrderNumber = dto.OrderNumber,
                 CustomerName = dto.CustomerName,
-                OrderDate = dto.OrderDate,
+                OrderDate = (DateTime)dto.OrderDate,
                 CreatedDate = dto.CreatedDate,
                 TypeId = dto.TypeId != null ? Guid.Parse(dto.TypeId) : null,
                 StatusId = dto.StatusId != null ? Guid.Parse(dto.StatusId) : null
@@ -25,7 +25,7 @@ namespace API.Extensions
         {
             model.OrderNumber = dto.OrderNumber;
             model.CustomerName = dto.CustomerName;
-            model.OrderDate = dto.OrderDate;
+            model.OrderDate = (DateTime)dto.OrderDate;
             model.CreatedDate = dto.CreatedDate;
             model.TypeId = dto.TypeId != null ? Guid.Parse(dto.TypeId) : null;
             model.StatusId = dto.StatusId != null ? Guid.Parse(dto.StatusId) : null;
@@ -41,9 +41,9 @@ namespace API.Extensions
             {
                 LineNumber = dto.LineNumber,
                 ProductCode = dto.ProductCode,
-                Quantity = dto.Quantity,
-                SalesPrice = dto.SalesPrice,
-                CostPrice = dto.CostPrice,
+                Quantity = (int)dto.Quantity,
+                SalesPrice = (decimal)dto.SalesPrice,
+                CostPrice = (decimal)dto.CostPrice,
                 OrderId = dto.OrderId,
                 ProductTypeId = dto.ProductTypeId != null ? Guid.Parse(dto.ProductTypeId) : null
             };
@@ -53,9 +53,9 @@ namespace API.Extensions
         {
             model.LineNumber = dto.LineNumber;
             model.ProductCode = dto.ProductCode;
-            model.Quantity = dto.Quantity;
-            model.SalesPrice = dto.SalesPrice;
-            model.CostPrice = dto.CostPrice;
+            model.Quantity = (int)dto.Quantity;
+            model.SalesPrice = (decimal)dto.SalesPrice;
+            model.CostPrice = (decimal)dto.CostPrice;
             model.OrderId = dto.OrderId;
             model.ProductTypeId = dto.ProductTypeId != null ? Guid.Parse(dto.ProductTypeId) : null;
 

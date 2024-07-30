@@ -1,12 +1,12 @@
-﻿using API.Models;
+﻿using Shared.Models;
 
-namespace API.Dtos
+namespace Shared.Dtos
 {
     public class LookupDto
     {
         public LookupDto() { }
 
-        public LookupDto (LookupModel model)
+        public LookupDto(LookupModel model)
         {
             Id = model.Id.ToString();
             Value = model.Value;

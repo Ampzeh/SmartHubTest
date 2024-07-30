@@ -1,4 +1,6 @@
-﻿namespace UI.Dtos.Utilities
+﻿using Shared.Dtos;
+
+namespace Shared.Dtos.Utilities
 {
     public class ManageOrderUtilitiesDto
     {

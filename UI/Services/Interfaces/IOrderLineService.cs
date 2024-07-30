@@ -1,4 +1,4 @@
-﻿using UI.Dtos;
+﻿using Shared.Dtos;
 
 namespace UI.Services.Interfaces
 {

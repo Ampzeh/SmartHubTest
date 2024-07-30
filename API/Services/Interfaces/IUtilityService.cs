@@ -1,5 +1,4 @@
-﻿using API.Dtos;
-using API.Dtos.Utilities;
+﻿using Shared.Dtos.Utilities;
 
 namespace API.Services.Interfaces
 {

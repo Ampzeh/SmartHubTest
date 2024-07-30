@@ -1,7 +1,7 @@
 ﻿using API.Constants;
-using API.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Shared.Models;
 
 namespace API.DataAccess
 {

@@ -1,7 +1,7 @@
 ﻿@page "/manage-order"
 @page "/manage-order/{id:guid}"
-@using UI.Dtos
-@using UI.Dtos.Utilities
+@using Shared.Dtos
+@using Shared.Dtos.Utilities
 @using UI.Services.Interfaces
 @inject NavigationManager _navigationManager
 @inject IOrderService _orderService
@@ -124,6 +124,8 @@ else
         isEdit = id != Guid.Empty;
         if (isEdit)
             order = await _orderService.GetOrder(id);
+        else
+            order.CreatedDate = DateTime.UtcNow;
 
         isLoading = false;
     }
